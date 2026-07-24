@@ -162,80 +162,37 @@ background:#ef4444;
 
 }
 
+/* =================================
+KBO CARD GAME
+style.css
+================================= */
 
 
+*{
 
+    box-sizing:border-box;
 
-/* 경기 */
+    font-family:
 
-
-.league button{
-
-background:#f97316;
-
-}
-
-
-
-
-
-.league button:nth-child(3){
-
-background:#dc2626;
+    Arial,
+    "Noto Sans KR",
+    sans-serif;
 
 }
 
 
 
 
-
-/* 저장 */
-
-
-.save button{
-
-background:#8b5cf6;
-
-}
+body{
 
 
+    margin:0;
 
+    background:#101522;
 
+    color:white;
 
-/* 정보 표시 */
-
-
-.info div{
-
-font-size:22px;
-
-margin:10px;
-
-background:#374151;
-
-padding:10px;
-
-border-radius:10px;
-
-}
-
-
-
-
-
-/* 카드 영역 */
-
-
-#cardList{
-
-
-display:flex;
-
-flex-wrap:wrap;
-
-justify-content:center;
-
-gap:10px;
+    text-align:center;
 
 
 }
@@ -244,18 +201,32 @@ gap:10px;
 
 
 
-.card{
 
 
-width:150px;
+header{
 
-background:#374151;
 
-padding:15px;
+    background:#172554;
 
-border-radius:12px;
+    padding:20px;
 
-border:2px solid #facc15;
+    border-bottom:
+
+    3px solid #38bdf8;
+
+
+}
+
+
+
+
+h1{
+
+
+    margin:0;
+
+    font-size:28px;
+
 
 }
 
@@ -263,21 +234,267 @@ border:2px solid #facc15;
 
 
 
-.card .name{
 
-font-size:20px;
+#info{
 
-font-weight:bold;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:30px;
+
+    margin-top:15px;
+
+    font-size:18px;
+
 
 }
 
 
 
-.card .grade{
 
-font-size:30px;
+
+
+
+
+section{
+
+
+    margin:15px;
+
+    padding:15px;
+
+    background:#1e293b;
+
+    border-radius:15px;
+
 
 }
+
+
+
+
+
+
+
+
+button{
+
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px 18px;
+
+    margin:5px;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+button:hover{
+
+
+    background:#38bdf8;
+
+
+}
+
+
+
+
+
+
+
+/* 선수 카드 */
+
+
+.playerCard{
+
+
+    display:inline-block;
+
+    width:150px;
+
+    margin:8px;
+
+    padding:12px;
+
+    border-radius:15px;
+
+    background:#334155;
+
+    border:
+
+    2px solid #64748b;
+
+
+}
+
+
+
+
+
+
+
+.playerCard img{
+
+
+    width:80px;
+
+    height:80px;
+
+    border-radius:50%;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* 등급 색상 */
+
+
+.normal{
+
+
+    border-color:white;
+
+
+}
+
+
+.A{
+
+
+    border-color:#3b82f6;
+
+
+}
+
+
+.S{
+
+
+    border-color:#22c55e;
+
+
+}
+
+
+.gold{
+
+
+    border-color:#facc15;
+
+
+}
+
+
+.signature{
+
+
+    border-color:#ef4444;
+
+
+}
+
+
+.legendSignature{
+
+
+    border-color:#ec4899;
+
+
+}
+
+
+.legend{
+
+
+    border-color:#a855f7;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* 시장 목록 */
+
+
+.marketCard{
+
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#334155;
+
+    padding:12px;
+
+    margin:8px;
+
+    border-radius:12px;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* 선수 목록 */
+
+
+#playerList,
+#faList,
+#tradeList{
+
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+
+}
+
+
+
+
 
 
 
@@ -286,31 +503,39 @@ font-size:30px;
 /* 모바일 */
 
 
-@media(max-width:500px){
+@media(max-width:600px){
 
 
 
-header h1{
+    h1{
 
-font-size:24px;
+        font-size:22px;
 
-}
-
-
-
-button{
-
-width:90%;
-
-}
+    }
 
 
 
-section{
 
-width:95%;
+    button{
 
-}
+
+        width:90%;
+
+        font-size:16px;
+
+
+    }
+
+
+
+
+    .playerCard{
+
+
+        width:45%;
+
+
+    }
 
 
 

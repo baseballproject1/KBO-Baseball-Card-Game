@@ -1,30 +1,26 @@
 // =================================
 // KBO CARD GAME
 // contract.js
-// 선수 계약 / 재계약 시스템
+// 선수 계약 시스템
 // =================================
 
 
 
+
+
 // =================================
-// FA 기준 금액
+// 계약 설정
 // =================================
 
-const PLAYER_CONTRACT_PRICE = {
 
-    "⚪":1000000000,      // 10억
+const FIRST_CONTRACT_SEASON = 1;
 
-    "🔵":2000000000,      // 20억
+const RENEW_CONTRACT_SEASON = 5;
 
-    "🟢":3000000000,      // 30억
+const RENEW_RATE = 0.5;
 
-    "🟡":5000000000,      // 50억
 
-    "🔴":7000000000,      // 70억
 
-    "🟪🟥":10000000000    // 100억
-
-};
 
 
 
@@ -32,23 +28,24 @@ const PLAYER_CONTRACT_PRICE = {
 
 
 // =================================
-// 선수 영입 시 계약기간 설정
+// 선수 영입 시 계약 설정
 // =================================
 
-function setPlayerContract(player, type){
+function setPlayerContract(player,type){
+
 
 
     // 레전드
 
-    if(player.grade==="🟣"){
-
+    if(
+        player.grade==="🟣"
+    ){
 
         player.contractType="legend";
 
         player.contractSeason=-1;
 
         player.needRenew=false;
-
 
         return player;
 
@@ -60,19 +57,30 @@ function setPlayerContract(player, type){
 
 
 
+
     // FA / 트레이드
 
     if(
-        type==="FA" ||
+
+        type==="FA"
+
+        ||
+
         type==="TRADE"
+
     ){
 
 
         player.contractType=type;
 
+
         player.contractSeason=5;
 
+
         player.needRenew=false;
+
+
+        return player;
 
 
     }
@@ -83,21 +91,17 @@ function setPlayerContract(player, type){
 
 
 
-    // 기본 선수 / 뽑기 선수
 
-    else{
-
-
-        player.contractType="normal";
-
-        player.contractSeason=1;
-
-        player.needRenew=false;
+    // 생성 / 뽑기 선수
 
 
-    }
+    player.contractType="normal";
 
 
+    player.contractSeason=1;
+
+
+    player.needRenew=false;
 
 
 
@@ -115,10 +119,10 @@ function setPlayerContract(player, type){
 
 
 // =================================
-// 시즌 종료 계약 체크
+// 시즌 종료 처리
 // =================================
 
-function endSeasonContractCheck(){
+function endSeasonContract(){
 
 
 
@@ -126,15 +130,20 @@ function endSeasonContractCheck(){
 
 
 
-        // 레전드는 제외
+
+
+        // 레전드 제외
 
         if(
+
             player.grade==="🟣"
+
         ){
 
             return;
 
         }
+
 
 
 
@@ -149,12 +158,12 @@ function endSeasonContractCheck(){
 
 
 
+
         if(
+
             player.contractSeason<=0
+
         ){
-
-
-            player.contractSeason=0;
 
 
             player.needRenew=true;
@@ -164,13 +173,18 @@ function endSeasonContractCheck(){
 
 
 
+
+
     });
 
 
 
 
 
-    saveGame();
+
+
+    saveGame(currentSlot);
+
 
 
 }
@@ -187,12 +201,12 @@ function endSeasonContractCheck(){
 // 재계약 비용 계산
 // =================================
 
-function getRenewPrice(player){
+function getRenewCost(player){
 
 
 
     if(
-        player.grade==="🟣"
+        !player.faPrice
     ){
 
         return 0;
@@ -202,10 +216,17 @@ function getRenewPrice(player){
 
 
 
+
+
+
     return (
-        PLAYER_CONTRACT_PRICE[player.grade]
+
+        player.faPrice
+
         *
-        0.5
+
+        RENEW_RATE
+
     );
 
 
@@ -220,25 +241,10 @@ function getRenewPrice(player){
 
 
 // =================================
-// 재계약
+// 재계약 실행
 // =================================
 
 function renewContract(player){
-
-
-
-    // 레전드
-
-    if(
-        player.grade==="🟣"
-    ){
-
-        return "레전드는 영구 보유입니다.";
-
-    }
-
-
-
 
 
 
@@ -246,7 +252,7 @@ function renewContract(player){
         !player.needRenew
     ){
 
-        return "아직 재계약 기간이 아닙니다.";
+        return "재계약 대상이 아닙니다.";
 
     }
 
@@ -256,8 +262,10 @@ function renewContract(player){
 
 
 
-    let price =
-    getRenewPrice(player);
+    let cost =
+
+    getRenewCost(player);
+
 
 
 
@@ -265,7 +273,7 @@ function renewContract(player){
 
 
     if(
-        !useMoney(price)
+        !useMoney(cost)
     ){
 
         return "재계약 비용이 부족합니다.";
@@ -277,9 +285,14 @@ function renewContract(player){
 
 
 
-    // 5시즌 연장
 
-    player.contractSeason=5;
+    player.contractSeason=
+
+    RENEW_CONTRACT_SEASON;
+
+
+
+
 
 
     player.needRenew=false;
@@ -287,13 +300,26 @@ function renewContract(player){
 
 
 
-    saveGame();
+
+
+    saveGame(currentSlot);
 
 
 
 
 
-    return player.name+" 재계약 완료!";
+
+
+    return (
+
+        player.name
+
+        +
+
+        " 재계약 완료!"
+
+    );
+
 
 }
 
@@ -309,12 +335,14 @@ function renewContract(player){
 // 계약 상태 확인
 // =================================
 
-function checkPlayerContract(player){
+function getContractText(player){
 
 
 
     if(
+
         player.grade==="🟣"
+
     ){
 
         return "영구 보유";
@@ -324,8 +352,13 @@ function checkPlayerContract(player){
 
 
 
+
+
+
     if(
+
         player.needRenew
+
     ){
 
         return "재계약 필요";
@@ -335,14 +368,87 @@ function checkPlayerContract(player){
 
 
 
+
+
+
     return (
 
-        "계약 "+
+        player.contractSeason
 
-        player.contractSeason+
+        +
 
         "시즌 남음"
 
     );
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// FA/트레이드 영입
+// =================================
+
+function signPlayerFromMarket(player,type){
+
+
+
+    let newPlayer={
+
+        ...player
+
+    };
+
+
+
+
+
+
+    setPlayerContract(
+
+        newPlayer,
+
+        type
+
+    );
+
+
+
+
+
+
+
+    userData.cards.push(newPlayer);
+
+
+
+
+
+
+    saveGame(currentSlot);
+
+
+
+
+
+
+
+    return (
+
+        newPlayer.name
+
+        +
+
+        " 영입 완료!"
+
+    );
+
 
 }

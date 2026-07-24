@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KBO CARD GAME</title>
+
+
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+
+
+
+<body>
+
+
+<header>
+
+<h1>⚾ KBO CARD GAME</h1>
+
+
+<div id="info">
+
+<p id="money">
+돈 : 100억
+</p>
+
+
+<p id="season">
+1시즌
+</p>
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+
+<!-- 세이브 슬롯 -->
+
+<section>
+
+<h2>💾 세이브 슬롯</h2>
+
+
+<button onclick="initGame(1)">
+슬롯1
+</button>
+
+
+<button onclick="initGame(2)">
+슬롯2
+</button>
+
+
+<button onclick="initGame(3)">
+슬롯3
+</button>
+
+
+<button onclick="initGame(4)">
+슬롯4
+</button>
+
+
+<button onclick="initGame(5)">
+슬롯5
+</button>
+
+
+</section>
+
+
+
+
+
+
+
+
+<!-- 메인 메뉴 -->
+
+<section>
+
+<h2>메뉴</h2>
+
+
+
+<button onclick="playMatch()">
+경기 시작
+</button>
+
+
+
+<button onclick="openFA()">
+FA 시장
+</button>
+
+
+
+
+<button onclick="openTrade()">
+트레이드 시장
+</button>
+
+
+
+
+
+<button onclick="drawCard('normal')">
+일반 뽑기
+</button>
+
+
+
+
+
+<button onclick="drawCard('premium')">
+고급 뽑기
+</button>
+
+
+
+
+
+<button onclick="exitGame()">
+저장
+</button>
+
+
+</section>
+
+
+
+
+
+
+
+
+<!-- 선수 목록 -->
+
+<section>
+
+
+<h2>보유 선수</h2>
+
+
+
+<div id="playerList">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- FA 목록 -->
+
+<section>
+
+
+<h2>FA 목록</h2>
+
+
+<div id="faList">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+<!-- 트레이드 목록 -->
+
+<section>
+
+
+<h2>트레이드 목록</h2>
+
+
+<div id="tradeList">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- JS 연결 순서 -->
+
+<script src="players.js"></script>
+
+<script src="trait.js"></script>
+
+<script src="save.js"></script>
+
+<script src="contract.js"></script>
+
+<script src="shopitems.js"></script>
+
+<script src="gacha.js"></script>
+
+<script src="enhance.js"></script>
+
+<script src="legend.js"></script>
+
+<script src="fa.js"></script>
+
+<script src="trade.js"></script>
+
+<script src="game.js"></script>
+
+<script src="script.js"></script>
+
+
+
+</body>
+
+
+</html>

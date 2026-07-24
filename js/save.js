@@ -1,112 +1,98 @@
 // =================================
 // KBO CARD GAME
 // save.js
-// 5개 저장 슬롯 시스템
+// 세이브 슬롯 시스템
 // =================================
 
 
+const SAVE_KEY = "KBO_CARD_GAME_SAVE_SLOTS";
 
-// 저장 슬롯
-
-const SAVE_SLOTS = [
-
-    "KBO_CARD_GAME_SAVE_1",
-    "KBO_CARD_GAME_SAVE_2",
-    "KBO_CARD_GAME_SAVE_3",
-    "KBO_CARD_GAME_SAVE_4",
-    "KBO_CARD_GAME_SAVE_5"
-
-];
+const MAX_SLOT = 5;
 
 
 
 
 
 // =================================
-// 기본 데이터
+// 기본 데이터 생성
 // =================================
 
-
-let userData = {
-
-
-    team:null,
+function createDefaultData(){
 
 
-    money:10000000000,
+    return {
 
 
-    cards:[],
+        team:null,
 
 
-    items:{},
+        money:10000000000,
 
 
-    stage:1,
+        cards:[],
 
 
-    season:{
+        items:{
 
 
-        game:0,
+            normalTicket:0,
+
+            premiumTicket:0,
 
 
-        win:0,
+            enhanceTicket:0,
 
 
-        lose:0
+            protectTicket:0,
 
 
-    }
+            premiumEnhanceTicket:0,
 
 
-};
+            normalContract:0,
 
 
+            premiumContract:0,
 
 
+            legendContract:0,
 
 
-// =================================
-// 저장
-// =================================
+            traitChangeTicket:0
 
 
-function saveGame(slot=1){
+        },
 
 
 
-    if(slot<1 || slot>5){
+        // FA
 
-        console.log(
-        "잘못된 저장 슬롯"
-        );
-
-        return false;
-
-    }
+        FAList:[],
 
 
+        faCount:0,
 
-    localStorage.setItem(
 
-        SAVE_SLOTS[slot-1],
-
-        JSON.stringify(userData)
-
-    );
+        lastFARefresh:"",
 
 
 
-    console.log(
 
-        slot+"번 저장 완료"
+        // 시즌
 
-    );
-
+        season:1,
 
 
-    return true;
+        seasonPlaying:false,
+
+
+
+        // 저장 정보
+
+        saveTime:""
+
+
+    };
 
 
 }
@@ -116,55 +102,173 @@ function saveGame(slot=1){
 
 
 
+
 // =================================
-// 불러오기
+// 전체 슬롯 불러오기
 // =================================
 
-
-function loadGame(slot=1){
-
+function getSaveSlots(){
 
 
-    if(slot<1 || slot>5){
+    let data =
 
-        return false;
+    localStorage.getItem(SAVE_KEY);
+
+
+
+    if(!data){
+
+
+        let slots=[];
+
+
+        for(
+            let i=0;
+            i<MAX_SLOT;
+            i++
+        ){
+
+            slots.push(null);
+
+        }
+
+
+        return slots;
 
     }
 
 
 
-    let data =
 
-    localStorage.getItem(
+    return JSON.parse(data);
 
-        SAVE_SLOTS[slot-1]
+
+}
+
+
+
+
+
+
+
+// =================================
+// 슬롯 저장
+// =================================
+
+function saveGame(slot){
+
+
+
+    if(
+        slot<1
+        ||
+        slot>MAX_SLOT
+    ){
+
+        return "잘못된 슬롯";
+
+    }
+
+
+
+
+
+    userData.saveTime =
+
+    new Date().toLocaleString();
+
+
+
+
+
+    let slots =
+
+    getSaveSlots();
+
+
+
+
+
+    slots[slot-1]=userData;
+
+
+
+
+
+    localStorage.setItem(
+
+        SAVE_KEY,
+
+        JSON.stringify(slots)
 
     );
+
+
+
+
+
+}
+
+
+
+
+
+
+
+// =================================
+// 슬롯 불러오기
+// =================================
+
+function loadGame(slot){
+
+
+
+    let slots =
+
+    getSaveSlots();
+
+
+
+
+
+    let data =
+
+    slots[slot-1];
+
+
+
 
 
 
 
     if(!data){
 
+
+        userData =
+
+        createDefaultData();
+
+
         return false;
+
 
     }
 
 
 
 
-    userData =
-
-    JSON.parse(data);
 
 
 
+    userData=data;
 
-    console.log(
 
-    slot+"번 불러오기 완료"
 
-    );
+
+
+    repairSaveData();
+
+
 
 
 
@@ -180,67 +284,110 @@ function loadGame(slot=1){
 
 
 // =================================
-// 저장 확인
+// 슬롯 삭제
 // =================================
-
-
-function checkSave(slot){
-
-
-
-    if(slot<1 || slot>5){
-
-        return false;
-
-    }
-
-
-
-    return (
-
-    localStorage.getItem(
-
-        SAVE_SLOTS[slot-1]
-
-    ) !== null
-
-    );
-
-
-}
-
-
-
-
-
-
-
-// =================================
-// 저장 삭제
-// =================================
-
 
 function deleteSave(slot){
 
 
 
-    if(slot<1 || slot>5){
+    let slots =
 
-        return false;
-
-    }
+    getSaveSlots();
 
 
 
-    localStorage.removeItem(
 
-        SAVE_SLOTS[slot-1]
+
+    slots[slot-1]=null;
+
+
+
+
+
+    localStorage.setItem(
+
+        SAVE_KEY,
+
+        JSON.stringify(slots)
 
     );
 
 
+}
 
-    return true;
+
+
+
+
+
+
+// =================================
+// 슬롯 정보 표시
+// =================================
+
+function getSlotInfo(){
+
+
+
+    let slots =
+
+    getSaveSlots();
+
+
+
+
+
+
+    return slots.map((data,index)=>{
+
+
+        if(!data){
+
+
+            return {
+
+
+                slot:index+1,
+
+
+                empty:true
+
+
+            };
+
+
+        }
+
+
+
+
+
+        return {
+
+
+            slot:index+1,
+
+
+            empty:false,
+
+
+            team:data.team,
+
+
+            season:data.season,
+
+
+            money:data.money,
+
+
+            saveTime:data.saveTime
+
+
+        };
+
+
+    });
 
 
 }
@@ -252,69 +399,65 @@ function deleteSave(slot){
 
 
 // =================================
-// 카드 추가
+// 저장 데이터 보정
 // =================================
 
-
-function addCard(player){
-
-
-
-    let card={
+function repairSaveData(){
 
 
 
-        id:player.id,
+    if(!userData.items){
 
+        userData.items={};
 
-        name:player.name,
-
-
-        team:player.team,
-
-
-        position:player.position,
-
-
-        grade:player.grade,
-
-
-        stats:{
-
-
-            ...player.stats
-
-
-        },
-
-
-        trait:
-
-
-        player.trait || "없음",
-
-
-
-        enhance:0
-
-
-
-    };
+    }
 
 
 
 
-    userData.cards.push(card);
+
+
+    const itemList=[
+
+
+        "normalTicket",
+
+        "premiumTicket",
+
+        "enhanceTicket",
+
+        "protectTicket",
+
+        "premiumEnhanceTicket",
+
+        "normalContract",
+
+        "premiumContract",
+
+        "legendContract",
+
+        "traitChangeTicket"
+
+
+    ];
 
 
 
-    saveGame();
 
 
-    return card;
+    itemList.forEach(item=>{
 
 
-}
+        if(
+            userData.items[item]===undefined
+        ){
+
+            userData.items[item]=0;
+
+        }
+
+
+    });
 
 
 
@@ -322,197 +465,128 @@ function addCard(player){
 
 
 
-// =================================
-// 카드 제거
-// =================================
+    if(!userData.cards){
 
 
-function removeCard(card){
-
-
-
-    let index =
-
-    userData.cards.indexOf(card);
-
-
-
-    if(index!==-1){
-
-
-        userData.cards.splice(
-
-            index,
-
-            1
-
-        );
+        userData.cards=[];
 
 
     }
 
 
 
-    saveGame();
 
 
-}
+    if(!userData.FAList){
 
 
+        userData.FAList=[];
 
 
+    }
 
 
-
-// =================================
-// 돈 추가
-// =================================
-
-
-function addMoney(amount){
-
-
-    userData.money += amount;
-
-
-}
-
-
-
-
-
-
-// =================================
-// 돈 사용
-// =================================
-
-
-function useMoney(amount){
 
 
 
     if(
-
-    userData.money >= amount
-
+        userData.faCount===undefined
     ){
 
-
-        userData.money -= amount;
-
-
-        return true;
-
+        userData.faCount=0;
 
     }
 
 
-
-    return false;
-
-
-}
-
-
-
-
-
-
-
-// =================================
-// 아이템 추가
-// =================================
-
-
-function addItem(item){
 
 
 
     if(
-
-    !userData.items[item]
-
+        userData.season===undefined
     ){
 
-
-        userData.items[item]=0;
-
-
-    }
-
-
-
-    userData.items[item]++;
-
-
-
-    saveGame();
-
-
-}
-
-
-
-
-
-
-
-// =================================
-// 아이템 사용
-// =================================
-
-
-function useItem(item){
-
-
-
-    if(
-
-    !userData.items[item]
-
-    ||
-
-    userData.items[item]<=0
-
-    ){
-
-
-        return false;
-
+        userData.season=1;
 
     }
 
 
 
 
-    userData.items[item]--;
 
 
 
-    saveGame();
+    // 선수 데이터 보정
+
+    userData.cards.forEach(player=>{
+
+
+        if(!player.stats){
+
+
+            player.stats={
+
+                power:0,
+
+                contact:0,
+
+                speed:0,
+
+                defense:0,
+
+                control:0
+
+            };
+
+
+        }
 
 
 
-    return true;
 
 
-}
+        if(
+            player.enhance===undefined
+        ){
+
+            player.enhance=0;
+
+        }
 
 
 
 
 
+        if(
+            player.trait===undefined
+        ){
+
+            player.trait=null;
+
+            player.traitValue=0;
+
+        }
 
 
-// =================================
-// 자동 불러오기
-// =================================
 
 
-if(checkSave(1)){
+
+        if(
+            player.contractSeason===undefined
+        ){
+
+            player.contractSeason=1;
+
+        }
 
 
-    loadGame(1);
+
+    });
 
 
-}
+
+
+
+    saveGame(currentSlot);
+
+
+    }

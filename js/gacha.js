@@ -7,50 +7,23 @@
 
 
 // =================================
-// 등급 확률
+// 일반 뽑기 확률
+// ⚪50 🔵20 🟢15 🟡5 🔴5 🟪🟥0
 // =================================
 
+const NORMAL_GACHA_RATE = {
 
-const GACHA_RATE = {
+    "⚪":50,
 
+    "🔵":20,
 
-    normal:{
+    "🟢":15,
 
+    "🟡":5,
 
-        "⚪":50,
+    "🔴":3,
 
-        "🔵":20,
-
-        "🟢":15,
-
-        "🟡":5,
-
-        "🔴":5,
-
-        "🟪🟥":5
-
-
-    },
-
-
-
-    premium:{
-
-
-        "🔵":35,
-
-        "🟢":30,
-
-        "🟡":15,
-
-        "🔴":10,
-
-        "🟪🟥":10
-
-
-    }
-
-
+   "🟪🟥"2
 };
 
 
@@ -59,53 +32,67 @@ const GACHA_RATE = {
 
 
 // =================================
-// 등급 뽑기
+// 고급 뽑기 확률
+// 🟡15 🔴10 🟪🟥10
 // =================================
 
-
-function getGachaGrade(type){
-
-
-    let rate =
-
-    GACHA_RATE[type];
+const PREMIUM_GACHA_RATE = {
 
 
+    "🔵":60,
 
-    if(!rate)
+    "🟢":20,
 
-        return null;
+    "🟡":10,
+
+    "🔴":6,
+
+    "🟪🟥":4
+
+};
 
 
+
+
+
+
+
+
+
+// =================================
+// 등급 랜덤
+// =================================
+
+function randomGrade(rate){
 
 
     let random =
-
     Math.random()*100;
-
 
 
     let total=0;
 
 
 
-    for(let grade in rate){
+    for(
+        let grade in rate
+    ){
 
 
         total += rate[grade];
 
 
-
-        if(random < total){
-
+        if(random <= total){
 
             return grade;
 
-
         }
 
-
     }
+
+
+
+    return "⚪";
 
 
 }
@@ -116,31 +103,32 @@ function getGachaGrade(type){
 
 
 
-// =================================
-// 카드 뽑기
-// =================================
 
 
-function drawCard(type="normal"){
+// =================================
+// 선수 뽑기
+// =================================
+
+function drawPlayer(rate){
 
 
 
     let grade =
-
-    getGachaGrade(type);
-
+    randomGrade(rate);
 
 
 
 
 
-    let pool =
+    let list = players.filter(
 
-    players.filter(
+        p =>
 
-        player =>
+        p.grade === grade
 
-        player.grade===grade
+        &&
+
+        p.grade !== "🟣"
 
     );
 
@@ -148,22 +136,11 @@ function drawCard(type="normal"){
 
 
 
-
-
-    if(pool.length===0){
-
-
-
-        console.log(
-
-        grade+" 등급 선수 없음"
-
-        );
-
-
+    if(
+        list.length===0
+    ){
 
         return null;
-
 
     }
 
@@ -174,7 +151,7 @@ function drawCard(type="normal"){
 
     let player =
 
-    pool[
+    list[
 
         Math.floor(
 
@@ -182,7 +159,7 @@ function drawCard(type="normal"){
 
             *
 
-            pool.length
+            list.length
 
         )
 
@@ -192,67 +169,17 @@ function drawCard(type="normal"){
 
 
 
+    return {
 
+        ...player,
 
-    let card={
+        contractType:"normal",
 
+        contractSeason:1,
 
-
-        id:player.id,
-
-
-        name:player.name,
-
-
-        team:player.team,
-
-
-        position:player.position,
-
-
-        grade:player.grade,
-
-
-
-        stats:{
-
-
-            ...player.stats
-
-
-        },
-
-
-
-        trait:
-
-        player.trait || "없음",
-
-
-
-        enhance:0
-
-
+        needRenew:false
 
     };
-
-
-
-
-
-
-
-    userData.cards.push(card);
-
-
-
-    saveGame();
-
-
-
-
-
-    return card;
 
 
 }
@@ -263,15 +190,255 @@ function drawCard(type="normal"){
 
 
 
+
+
 // =================================
-// 확률 확인
+// 일반 뽑기
 // =================================
 
+function normalGacha(){
 
-function getGachaRate(type){
 
 
-    return GACHA_RATE[type];
+    if(
+
+        !userData.items.normalTicket
+
+        ||
+
+        userData.items.normalTicket<=0
+
+    ){
+
+        return "일반 뽑기권이 없습니다.";
+
+    }
+
+
+
+
+
+
+
+    userData.items.normalTicket--;
+
+
+
+
+
+
+
+
+    let player =
+
+    drawPlayer(
+
+        NORMAL_GACHA_RATE
+
+    );
+
+
+
+
+
+
+
+    if(!player){
+
+        return "뽑기 실패";
+
+    }
+
+
+
+
+
+
+
+    userData.cards.push(player);
+
+
+
+
+
+
+
+    saveGame();
+
+
+
+
+
+
+
+    return player.name+" 획득!";
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// 고급 뽑기
+// =================================
+
+function premiumGacha(){
+
+
+
+    if(
+
+        !userData.items.premiumTicket
+
+        ||
+
+        userData.items.premiumTicket<=0
+
+    ){
+
+        return "고급 뽑기권이 없습니다.";
+
+    }
+
+
+
+
+
+
+
+    userData.items.premiumTicket--;
+
+
+
+
+
+
+
+    let player =
+
+    drawPlayer(
+
+        PREMIUM_GACHA_RATE
+
+    );
+
+
+
+
+
+
+
+
+    if(!player){
+
+        return "뽑기 실패";
+
+    }
+
+
+
+
+
+
+
+    userData.cards.push(player);
+
+
+
+
+
+
+
+    saveGame();
+
+
+
+
+
+
+
+    return player.name+" 획득!";
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// 10회 뽑기
+// =================================
+
+function multiGacha(type,count=10){
+
+
+
+    let result=[];
+
+
+
+    for(
+        let i=0;
+        i<count;
+        i++
+    ){
+
+
+        let player;
+
+
+
+        if(type==="normal"){
+
+            player =
+            drawPlayer(
+                NORMAL_GACHA_RATE
+            );
+
+        }
+
+        else{
+
+
+            player =
+            drawPlayer(
+                PREMIUM_GACHA_RATE
+            );
+
+        }
+
+
+
+
+
+        if(player){
+
+            userData.cards.push(player);
+
+            result.push(player);
+
+        }
+
+
+    }
+
+
+
+
+    saveGame();
+
+
+
+    return result;
 
 
 }

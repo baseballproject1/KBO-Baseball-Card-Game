@@ -6,6 +6,8 @@
 
 
 
+// FA 등장 확률
+
 const FA_RATE = {
 
     "⚪":50,
@@ -25,30 +27,32 @@ const FA_RATE = {
 
 
 
+
 // FA 영입 가격
 
 const FA_PRICE = {
 
-    "⚪":1000000000,
+    "⚪":1000000000,      // 10억
 
-    "🔵":2000000000,
+    "🔵":2000000000,      // 20억
 
-    "🟢":3000000000,
+    "🟢":3000000000,      // 30억
 
-    "🟡":5000000000,
+    "🟡":5000000000,      // 50억
 
-    "🔴":7000000000,
+    "🔴":7000000000,      // 70억
 
-    "🟪🟥":10000000000
+    "🟪🟥":10000000000    // 100억
 
 };
 
 
 
 
-// 시즌 FA 제한
 
-const MAX_FA_COUNT = 5;
+const MAX_FA_SIGN = 5;
+
+
 
 
 
@@ -87,13 +91,15 @@ function randomFAGrade(){
 
         }
 
-
     }
+
 
 
     return "⚪";
 
 }
+
+
 
 
 
@@ -115,9 +121,7 @@ function createFAPlayer(){
 
 
 
-    let list =
-
-    players.filter(
+    let list = players.filter(
 
         p =>
 
@@ -145,6 +149,7 @@ function createFAPlayer(){
 
 
 
+
     let player =
 
     list[
@@ -165,19 +170,15 @@ function createFAPlayer(){
 
 
 
-    return {
 
+
+    return {
 
         ...player,
 
-
         FA:true,
 
-
-        FAprice:
-
-        FA_PRICE[grade]
-
+        FAprice:FA_PRICE[grade]
 
     };
 
@@ -191,9 +192,9 @@ function createFAPlayer(){
 
 
 
+
 // =================================
-// FA 목록 생성
-// 항상 6명
+// FA 목록 6명 유지
 // =================================
 
 function updateFAList(){
@@ -207,6 +208,7 @@ function updateFAList(){
         userData.FAList=[];
 
     }
+
 
 
 
@@ -232,15 +234,14 @@ function updateFAList(){
         }
 
 
-
     }
 
 
 
 
 
-    saveGame();
 
+    saveGame();
 
 
 }
@@ -261,10 +262,7 @@ function checkFARefresh(){
 
 
 
-    let now =
-    new Date();
-
-
+    let now = new Date();
 
 
 
@@ -295,39 +293,109 @@ function checkFARefresh(){
 
 
     if(
-        now.getHours() === 0
+
+        now.getHours()===0
 
         &&
 
-        now.getMinutes() === 0
+        now.getMinutes()===0
 
     ){
 
 
 
         if(
-            userData.lastFARefresh !== today
-        ){
 
+            userData.lastFARefresh !== today
+
+        ){
 
 
             updateFAList();
 
 
-
-            userData.lastFARefresh =
-            today;
-
+            userData.lastFARefresh=today;
 
 
             saveGame();
-
 
 
         }
 
 
     }
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// FA 계약서 확인
+// =================================
+
+function getFAContract(player){
+
+
+
+    if(
+
+        [
+
+            "⚪",
+
+            "🔵",
+
+            "🟢"
+
+        ]
+
+        .includes(player.grade)
+
+    ){
+
+        return "normalContract";
+
+    }
+
+
+
+
+
+
+
+    if(
+
+        [
+
+            "🟡",
+
+            "🔴",
+
+            "🟪🟥"
+
+        ]
+
+        .includes(player.grade)
+
+    ){
+
+        return "premiumContract";
+
+    }
+
+
+
+
+
+
+    return null;
 
 
 }
@@ -348,10 +416,10 @@ function canSignFA(){
 
 
 
-    // 시즌 중 불가
-
     if(
-        gameData.seasonPlaying === true
+
+        gameData.seasonPlaying
+
     ){
 
         return false;
@@ -362,20 +430,15 @@ function canSignFA(){
 
 
 
-
-    // 시즌 제한
-
     if(
 
-        userData.faCount >= MAX_FA_COUNT
+        userData.faCount >= MAX_FA_SIGN
 
     ){
 
         return false;
 
     }
-
-
 
 
 
@@ -401,56 +464,12 @@ function signFA(player){
 
 
     if(
+
         !canSignFA()
-    ){
-
-
-        return "시즌 종료 후 FA 영입 가능하며 시즌당 최대 5명입니다.";
-
-    }
-
-
-
-
-
-
-
-    let grade =
-    player.grade;
-
-
-
-
-
-
-    let contract;
-
-
-
-
-
-    // 일반 계약서
-
-    if(
-
-        [
-
-            "⚪",
-
-            "🔵",
-
-            "🟢"
-
-        ]
-
-        .includes(grade)
 
     ){
 
-
-        contract =
-        "normalContract";
-
+        return "시즌 종료 후 FA 영입 가능 (시즌당 최대 5명)";
 
     }
 
@@ -459,44 +478,21 @@ function signFA(player){
 
 
 
-    // 고급 계약서
+    let contract =
 
-    else if(
-
-        [
-
-            "🟡",
-
-            "🔴",
-
-            "🟪🟥"
-
-        ]
-
-        .includes(grade)
-
-    ){
+    getFAContract(player);
 
 
-        contract =
-        "premiumContract";
 
+
+
+
+    if(!contract){
+
+
+        return "레전드는 FA 영입 불가입니다.";
 
     }
-
-
-
-
-
-
-
-    else{
-
-
-        return "레전드는 FA 영입이 불가능합니다.";
-
-    }
-
 
 
 
@@ -514,10 +510,9 @@ function signFA(player){
 
         ||
 
-        userData.items[contract] <= 0
+        userData.items[contract] <=0
 
     ){
-
 
         return "필요한 계약서가 없습니다.";
 
@@ -530,20 +525,18 @@ function signFA(player){
 
 
 
-
-    // 돈 확인
+    // 계약금 지불
 
 
     if(
 
         !useMoney(
 
-            FA_PRICE[grade]
+            FA_PRICE[player.grade]
 
         )
 
     ){
-
 
         return "계약금이 부족합니다.";
 
@@ -556,7 +549,7 @@ function signFA(player){
 
 
 
-    // 계약서 사용
+    // 계약서 차감
 
 
     userData.items[contract]--;
@@ -568,25 +561,44 @@ function signFA(player){
 
 
 
+    // 선수 계약 5시즌
 
-    // 팀 등록
 
+    let newPlayer={
 
-    userData.cards.push({
 
         ...player,
 
-        FA:false
 
-    });
-
+        FA:false,
 
 
+        contractType:"FA",
+
+
+        contractSeason:5,
+
+
+        needRenew:false
+
+
+    };
 
 
 
 
-    // 영입 횟수 증가
+
+
+
+    userData.cards.push(newPlayer);
+
+
+
+
+
+
+
+    // FA 횟수 증가
 
 
     userData.faCount++;
@@ -615,14 +627,14 @@ function signFA(player){
 
 
 
-
     saveGame();
 
 
 
 
 
-    return player.name+" FA 계약 완료!";
+
+    return player.name+" FA 영입 완료!";
 
 
 }

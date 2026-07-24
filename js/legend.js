@@ -6,17 +6,25 @@
 
 
 
-function makeLegend(legendSignatureCard){
+const LEGEND_CREATE_COST = 10000000000;
 
 
 
-    // 해당 선수 레전드 시그니처 확인
+
+
+// =================================
+// 레전드 제작 가능 확인
+// =================================
+
+function canCreateLegend(signatureCard){
+
+
 
     if(
-        legendSignatureCard.grade !== "🟪🟥"
+        signatureCard.grade !== "🔴"
     ){
 
-        return "레전드 시그니처 카드가 필요합니다.";
+        return "시그니처 카드만 제작 가능합니다.";
 
     }
 
@@ -25,12 +33,96 @@ function makeLegend(legendSignatureCard){
 
 
 
-    // 계약서 확인
+
+    let team =
+    signatureCard.team;
+
+
+
+
+
+
+    // 같은 팀 골글 확인
+
+    let goldCount =
+
+    userData.cards.filter(
+
+        c =>
+
+        c.team === team
+
+        &&
+
+        c.grade === "🟡"
+
+    ).length;
+
+
+
+
+
 
     if(
+        goldCount < 2
+    ){
+
+        return "같은 팀 골든글러브 2장이 필요합니다.";
+
+    }
+
+
+
+
+
+
+
+    // 같은 팀 S 확인
+
+    let sCount =
+
+    userData.cards.filter(
+
+        c =>
+
+        c.team === team
+
+        &&
+
+        c.grade === "🟢"
+
+    ).length;
+
+
+
+
+
+
+
+    if(
+        sCount < 5
+    ){
+
+        return "같은 팀 S등급 5장이 필요합니다.";
+
+    }
+
+
+
+
+
+
+
+    // 레전드 계약서 확인
+
+    if(
+
         !userData.items.legendContract
+
         ||
-        userData.items.legendContract <= 0
+
+        userData.items.legendContract <=0
+
     ){
 
         return "레전드 계약서가 필요합니다.";
@@ -43,15 +135,16 @@ function makeLegend(legendSignatureCard){
 
 
 
-    // 제작 비용 100억
+
+    // 돈 확인
 
     if(
-        !useMoney(
-            10000000000
-        )
+
+        userData.money < LEGEND_CREATE_COST
+
     ){
 
-        return "100억이 필요합니다.";
+        return "제작 비용 100억이 필요합니다.";
 
     }
 
@@ -61,35 +154,40 @@ function makeLegend(legendSignatureCard){
 
 
 
-    // 같은 팀 골든글러브 확인
+    return true;
 
 
-    let goldCards =
-
-    userData.cards.filter(
-
-        card =>
-
-        card.team === legendSignatureCard.team
-
-        &&
-
-        card.grade === "🟡"
-
-    );
+}
 
 
 
 
-    if(
-        goldCards.length < 2
-    ){
 
 
-        addMoney(10000000000);
 
 
-        return "같은 팀 골든글러브 2장이 필요합니다.";
+
+// =================================
+// 레전드 제작
+// =================================
+
+function createLegend(signatureCard){
+
+
+
+    let check =
+
+    canCreateLegend(signatureCard);
+
+
+
+
+
+    if(check !== true){
+
+
+        return check;
+
 
     }
 
@@ -100,38 +198,34 @@ function makeLegend(legendSignatureCard){
 
 
 
-    // 같은 팀 S등급 확인
+    let team =
 
-
-    let sCards =
-
-    userData.cards.filter(
-
-        card =>
-
-        card.team === legendSignatureCard.team
-
-        &&
-
-        card.grade === "🟢"
-
-    );
+    signatureCard.team;
 
 
 
 
 
-    if(
-        sCards.length < 5
-    ){
 
 
-        addMoney(10000000000);
 
 
-        return "같은 팀 S등급 5장이 필요합니다.";
+    // 비용 차감
 
-    }
+    userData.money -=
+
+    LEGEND_CREATE_COST;
+
+
+
+
+
+
+
+    // 계약서 차감
+
+    userData.items.legendContract--;
+
 
 
 
@@ -141,37 +235,10 @@ function makeLegend(legendSignatureCard){
 
     // 재료 제거
 
-
-    removeCard(
-        legendSignatureCard
-    );
+    let removeGold = 2;
 
 
-
-    removeCard(
-        goldCards[0]
-    );
-
-
-    removeCard(
-        goldCards[1]
-    );
-
-
-
-
-
-    for(
-        let i=0;
-        i<5;
-        i++
-    ){
-
-        removeCard(
-            sCards[i]
-        );
-
-    }
+    let removeS = 5;
 
 
 
@@ -179,104 +246,116 @@ function makeLegend(legendSignatureCard){
 
 
 
-    // 계약서 사용
+    userData.cards =
 
-    useItem(
-        "legendContract"
-    );
+    userData.cards.filter(card=>{
 
 
 
+        if(
+
+            card.id === signatureCard.id
+
+        ){
+
+            return false;
+
+        }
 
 
 
 
 
-    // 레전드 카드 생성
 
+
+        if(
+
+            card.team===team
+
+            &&
+
+            card.grade==="🟡"
+
+            &&
+
+            removeGold>0
+
+        ){
+
+            removeGold--;
+
+            return false;
+
+        }
+
+
+
+
+
+
+
+
+        if(
+
+            card.team===team
+
+            &&
+
+            card.grade==="🟢"
+
+            &&
+
+            removeS>0
+
+        ){
+
+            removeS--;
+
+            return false;
+
+        }
+
+
+
+
+
+        return true;
+
+
+    });
+
+
+
+
+
+
+
+
+
+    // 레전드 생성
 
     let legendCard = {
 
 
-        id:
-
-        legendSignatureCard.id
-        +
-        "_legend",
+        ...signatureCard,
 
 
-
-        name:
-
-        legendSignatureCard.name,
+        grade:"🟣",
 
 
-
-        team:
-
-        legendSignatureCard.team,
+        contractType:"legend",
 
 
-
-        position:
-
-        legendSignatureCard.position,
+        contractSeason:-1,
 
 
-
-        grade:
-
-        "🟣",
+        needRenew:false,
 
 
-
-        trait:
-
-        "리빙 레전드",
+        legend:true,
 
 
-
-        enhance:
-
-        0,
-
-
-
-        stats:{
-
-
-
-            파워:
-
-            legendSignatureCard.stats.파워 + 5,
-
-
-
-            컨택:
-
-            legendSignatureCard.stats.컨택 + 5,
-
-
-
-            선구:
-
-            legendSignatureCard.stats.선구 + 5,
-
-
-
-            수비:
-
-            legendSignatureCard.stats.수비 + 5,
-
-
-
-            주루:
-
-            legendSignatureCard.stats.주루 + 5
-
-
-
-        }
+        FA:false
 
 
     };
@@ -287,11 +366,9 @@ function makeLegend(legendSignatureCard){
 
 
 
-    userData.cards.push(
+    userData.cards.push(legendCard);
 
-        legendCard
 
-    );
 
 
 
@@ -304,8 +381,16 @@ function makeLegend(legendSignatureCard){
 
 
 
-    return "레전드 제작 완료!";
 
+    return (
+
+        legendCard.name
+
+        +
+
+        " 레전드 제작 완료!"
+
+    );
 
 
 }

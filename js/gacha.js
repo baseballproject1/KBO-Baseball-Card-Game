@@ -1,4 +1,4 @@
-/// =================================
+// =================================
 // KBO CARD GAME
 // gacha.js
 // 뽑기 시스템
@@ -7,7 +7,7 @@
 
 
 // =================================
-// 등급 추출
+// 등급 뽑기
 // =================================
 
 
@@ -21,21 +21,49 @@ function getGachaGrade(type){
     if(type==="normal"){
 
 
-        table =
-        GAME_CONFIG.normalGacha;
+        table={
+
+            "⚪":50,
+
+            "🔵":20,
+
+            "🟢":15,
+
+            "🟡":5,
+
+            "🔴":5,
+
+            "🟪🟥":5
+
+        };
 
 
     }
+
 
 
     else if(type==="premium"){
 
 
-        table =
-        GAME_CONFIG.premiumGacha;
+        table={
+
+
+            "🔵":35,
+
+            "🟢":30,
+
+            "🟡":15,
+
+            "🔴":10,
+
+            "🟪🟥":10
+
+
+        };
 
 
     }
+
 
 
     else{
@@ -43,13 +71,16 @@ function getGachaGrade(type){
 
         return null;
 
+
     }
 
 
 
 
 
+
     let random =
+
     Math.random()*100;
 
 
@@ -59,6 +90,7 @@ function getGachaGrade(type){
 
 
     for(let grade in table){
+
 
 
         sum += table[grade];
@@ -74,11 +106,9 @@ function getGachaGrade(type){
         }
 
 
+
     }
 
-
-
-    return null;
 
 
 }
@@ -90,7 +120,7 @@ function getGachaGrade(type){
 
 
 // =================================
-// 선수 뽑기
+// 선수 카드 뽑기
 // =================================
 
 
@@ -99,15 +129,8 @@ function drawCard(type){
 
 
     let grade =
+
     getGachaGrade(type);
-
-
-
-    if(!grade){
-
-        return null;
-
-    }
 
 
 
@@ -117,11 +140,12 @@ function drawCard(type){
 
     players.filter(
 
-        player=>
+        player =>
 
         player.grade===grade
 
     );
+
 
 
 
@@ -132,11 +156,7 @@ function drawCard(type){
 
         console.log(
 
-        "해당 등급 선수 없음 : "
-
-        +
-
-        grade
+        "해당 등급 선수 없음"
 
         );
 
@@ -157,11 +177,7 @@ function drawCard(type){
 
         Math.floor(
 
-            Math.random()
-
-            *
-
-            pool.length
+            Math.random()*pool.length
 
         )
 
@@ -171,10 +187,57 @@ function drawCard(type){
 
 
 
-    let card =
 
-    addCard(player);
+    let card={
 
+
+        id:player.id,
+
+
+        name:player.name,
+
+
+        team:player.team,
+
+
+        position:player.position,
+
+
+        grade:player.grade,
+
+
+        stats:{
+
+
+            ...player.stats
+
+
+        },
+
+
+        trait:
+
+        player.trait || "없음",
+
+
+
+        enhance:0
+
+
+
+    };
+
+
+
+
+
+
+
+    userData.cards.push(card);
+
+
+
+    saveGame();
 
 
 
@@ -190,34 +253,64 @@ function drawCard(type){
 
 
 
-
 // =================================
-// 확률 확인용
+// 확률 확인
 // =================================
 
 
-function showGachaRate(type){
+function getGachaRate(type){
 
 
 
     if(type==="normal"){
 
 
-        return GAME_CONFIG.normalGacha;
+        return {
+
+
+            "⚪️":50,
+
+            "🔵":20,
+
+            "🟢":15,
+
+           "🟡":5,
+
+            "🔴":5,
+
+            "🟪🟥":5
+
+
+        };
 
 
     }
+
+
 
 
 
     if(type==="premium"){
 
 
-        return GAME_CONFIG.premiumGacha;
+        return {
+
+
+            "🔵":35,
+
+            "🟢":30,
+
+            "🟡":15,
+
+            "🔴":10,
+
+            "🟪🟥":10
+
+
+        };
 
 
     }
-
 
 
 }

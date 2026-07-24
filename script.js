@@ -280,15 +280,20 @@ function premiumDraw(){
         +
 
         card.name
+// =================================
+// KBO CARD GAME
+// script.js
+// 화면 연결
+// =================================
 
-        );
 
 
-    }
+// 메시지 출력
+
+function showMessage(text){
 
 
-
-    updateUI();
+    alert(text);
 
 
 }
@@ -299,55 +304,341 @@ function premiumDraw(){
 
 
 
+
 // =================================
-// 경기
+// 선수 목록 표시
 // =================================
 
-
-function playLeague(mode){
-
-
-
-    let result =
-    startLeague(mode);
+function renderPlayers(){
 
 
 
-    alert(
+    let box =
 
-    result.result
+    document.getElementById(
 
-    +
-
-    "\n상대 : "
-
-    +
-
-    result.enemy
-
-    +
-
-    "\n보상 : "
-
-    +
-
-    Math.floor(
-    result.reward/100000000
-    )
-
-    +
-
-    "억"
+        "playerList"
 
     );
 
 
 
-    if(result.seasonEnd){
+    if(!box) return;
 
 
-        alert(
-        "144경기 완료!\n다음 스테이지 해금!"
+
+    box.innerHTML="";
+
+
+
+
+
+
+
+    userData.cards.forEach(player=>{
+
+
+
+        let div=document.createElement("div");
+
+
+
+        div.className=
+
+        "playerCard";
+
+
+
+
+        div.innerHTML=`
+
+        <h3>${player.name}</h3>
+
+        <p>${player.team}</p>
+
+        <p>${player.grade}</p>
+
+        <p>강화 ${player.enhance}강</p>
+
+        <p>${player.trait || "특성 없음"}</p>
+
+        <p>${getContractText(player)}</p>
+
+        `;
+
+
+
+
+
+        box.appendChild(div);
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// FA 목록 표시
+// =================================
+
+function renderFA(){
+
+
+
+    let box =
+
+    document.getElementById(
+
+        "faList"
+
+    );
+
+
+
+    if(!box)return;
+
+
+
+    box.innerHTML="";
+
+
+
+
+
+
+    userData.FAList.forEach(player=>{
+
+
+
+        let div=document.createElement("div");
+
+
+
+        div.className=
+
+        "marketCard";
+
+
+
+
+        div.innerHTML=`
+
+        <span>
+
+        ${player.name}
+
+        ${player.grade}
+
+        </span>
+
+
+        <button onclick="recruitFA(${player.id})">
+
+        영입
+
+        </button>
+
+        `;
+
+
+
+        box.appendChild(div);
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// 트레이드 목록 표시
+// =================================
+
+function renderTrade(){
+
+
+
+    let box =
+
+    document.getElementById(
+
+        "tradeList"
+
+    );
+
+
+
+    if(!box)return;
+
+
+
+    box.innerHTML="";
+
+
+
+
+
+
+
+    userData.tradeList.forEach(player=>{
+
+
+
+        let div=document.createElement("div");
+
+
+
+        div.className=
+
+        "marketCard";
+
+
+
+
+
+        div.innerHTML=`
+
+        <span>
+
+        ${player.team}
+
+        |
+
+        ${player.name}
+
+        ${player.grade}
+
+        </span>
+
+
+        <button onclick="selectTrade(${player.id})">
+
+        선택
+
+        </button>
+
+        `;
+
+
+
+        box.appendChild(div);
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// FA 버튼
+// =================================
+
+function openFA(){
+
+
+    updateFAList();
+
+
+    renderFA();
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// 트레이드 버튼
+// =================================
+
+function openTrade(){
+
+
+    updateTradeList();
+
+
+    renderTrade();
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// 경기 버튼
+// =================================
+
+function playMatch(){
+
+
+
+    let result=
+
+    window.playMatch();
+
+
+
+    if(result){
+
+
+        showMessage(
+
+        "승리! 보상 획득"
+
+        );
+
+
+    }
+
+    else{
+
+
+        showMessage(
+
+        "패배..."
+
         );
 
 
@@ -355,10 +646,93 @@ function playLeague(mode){
 
 
 
-    updateUI();
+
+    renderPlayers();
 
 
 }
+
+
+
+
+
+
+
+
+
+// =================================
+// 뽑기 결과
+// =================================
+
+function drawCard(type){
+
+
+
+    let result =
+
+    window.gachaDraw(type);
+
+
+
+
+
+
+    if(!result){
+
+
+        showMessage(
+
+        "뽑기권이 부족합니다."
+
+        );
+
+
+        return;
+
+
+    }
+
+
+
+
+
+
+
+    addPlayer(
+
+        result,
+
+        "normal"
+
+    );
+
+
+
+
+
+
+
+    showMessage(
+
+        result.name
+
+        +
+
+        " 획득!"
+
+    );
+
+
+
+
+
+
+    renderPlayers();
+
+
+}
+
+
 
 
 
@@ -370,15 +744,16 @@ function playLeague(mode){
 // 저장
 // =================================
 
-
-function saveButton(slot){
-
-
-    saveGame(slot);
+function saveButton(){
 
 
-    alert(
-    slot+"번 저장 완료"
+    saveCurrentGame();
+
+
+    showMessage(
+
+    "저장 완료"
+
     );
 
 
@@ -389,38 +764,25 @@ function saveButton(slot){
 
 
 
+
+
+
 // =================================
-// 불러오기
+// 전체 갱신
 // =================================
 
-
-function loadButton(slot){
-
-
-    if(
-    loadGame(slot)
-    ){
+function refreshScreen(){
 
 
-        alert(
-        slot+"번 불러오기 완료"
-        );
+
+    renderPlayers();
 
 
-        updateUI();
+    renderFA();
 
 
-    }
+    renderTrade();
 
-    else{
-
-
-        alert(
-        "저장 데이터 없음"
-        );
-
-
-    }
 
 
 }
@@ -430,6 +792,23 @@ function loadButton(slot){
 
 
 
-// 시작
 
-updateUI();
+
+
+// =================================
+// 게임 시작
+// =================================
+
+window.onload=function(){
+
+
+
+    initGame(1);
+
+
+
+    refreshScreen();
+
+
+
+};

@@ -1,64 +1,84 @@
-// =================================
+/// =================================
 // KBO CARD GAME
 // gacha.js
-// 최종 뽑기 확률
+// 뽑기 시스템
 // =================================
 
 
-// 등급 뽑기 함수
 
-function getRandomGrade(type){
+// =================================
+// 등급 추출
+// =================================
 
-    let r = Math.random()*100;
+
+function getGachaGrade(type){
 
 
-    // 일반 뽑기
+    let table;
+
+
+
     if(type==="normal"){
 
 
-        if(r < 50)
-            return "⚪";
+        table =
+        GAME_CONFIG.normalGacha;
 
-        else if(r < 70)
-            return "🔵";
 
-        else if(r < 85)
-            return "🟢";
+    }
 
-        else if(r < 90)
-            return "🟡";
 
-        else if(r < 95)
-            return "🔴";
+    else if(type==="premium"){
 
-        else
-            return "🟪🟥";
+
+        table =
+        GAME_CONFIG.premiumGacha;
+
+
+    }
+
+
+    else{
+
+
+        return null;
 
     }
 
 
 
-    // 고급 뽑기
-
-    if(type==="premium"){
 
 
-        if(r < 35)
-            return "🔵";
+    let random =
+    Math.random()*100;
 
-        else if(r < 65)
-            return "🟢";
 
-        else if(r < 80)
-            return "🟡";
 
-        else if(r < 90)
-            return "🔴";
+    let sum=0;
 
-        else
-            return "🟪🟥";
+
+
+    for(let grade in table){
+
+
+        sum += table[grade];
+
+
+
+        if(random < sum){
+
+
+            return grade;
+
+
+        }
+
 
     }
+
+
+
+    return null;
 
 
 }
@@ -67,29 +87,23 @@ function getRandomGrade(type){
 
 
 
-// 카드 뽑기
+
+
+// =================================
+// 선수 뽑기
+// =================================
+
 
 function drawCard(type){
 
 
+
     let grade =
-    getRandomGrade(type);
+    getGachaGrade(type);
 
 
 
-    let pool =
-    players.filter(
-        p=>p.grade===grade
-    );
-
-
-
-    if(pool.length===0){
-
-        console.log(
-        "해당 등급 선수 없음:",
-        grade
-        );
+    if(!grade){
 
         return null;
 
@@ -97,19 +111,113 @@ function drawCard(type){
 
 
 
+
+
+    let pool =
+
+    players.filter(
+
+        player=>
+
+        player.grade===grade
+
+    );
+
+
+
+
+
+    if(pool.length===0){
+
+
+        console.log(
+
+        "해당 등급 선수 없음 : "
+
+        +
+
+        grade
+
+        );
+
+
+        return null;
+
+
+    }
+
+
+
+
+
+
     let player =
+
     pool[
+
         Math.floor(
-            Math.random()*pool.length
+
+            Math.random()
+
+            *
+
+            pool.length
+
         )
+
     ];
 
 
+
+
+
+    let card =
 
     addCard(player);
 
 
 
-    return player;
+
+
+    return card;
+
+
+
+}
+
+
+
+
+
+
+
+// =================================
+// 확률 확인용
+// =================================
+
+
+function showGachaRate(type){
+
+
+
+    if(type==="normal"){
+
+
+        return GAME_CONFIG.normalGacha;
+
+
+    }
+
+
+
+    if(type==="premium"){
+
+
+        return GAME_CONFIG.premiumGacha;
+
+
+    }
+
+
 
 }

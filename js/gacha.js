@@ -1,62 +1,65 @@
 // =================================
 // KBO CARD GAME
-// 선수 뽑기 시스템
+// gacha.js
+// 최종 뽑기 확률
 // =================================
 
 
-// 일반 뽑기 확률
-// ⚪ 일반 75
-// 🔵 A 20
-// 🟢 S 5
+// 등급 뽑기 함수
 
-function normalGacha(){
+function getRandomGrade(type){
 
-
-    let random =
-    Math.random()*100;
+    let r = Math.random()*100;
 
 
-    let grade;
+    // 일반 뽑기
+    if(type==="normal"){
 
 
-    if(random < 75){
+        if(r < 50)
+            return "⚪";
 
-        grade="⚪";
+        else if(r < 70)
+            return "🔵";
+
+        else if(r < 85)
+            return "🟢";
+
+        else if(r < 90)
+            return "🟡";
+
+        else if(r < 95)
+            return "🔴";
+
+        else
+            return "🟪🟥";
 
     }
-    else if(random < 95){
 
-        grade="🔵";
+
+
+    // 고급 뽑기
+
+    if(type==="premium"){
+
+
+        if(r < 35)
+            return "🔵";
+
+        else if(r < 65)
+            return "🟢";
+
+        else if(r < 80)
+            return "🟡";
+
+        else if(r < 90)
+            return "🔴";
+
+        else
+            return "🟪🟥";
 
     }
-    else{
 
-        grade="🟢";
-
-    }
-
-
-
-    let list =
-    players.filter(
-        p=>p.grade===grade
-    );
-
-
-
-    let player =
-    list[
-        Math.floor(
-            Math.random()*list.length
-        )
-    ];
-
-
-
-    addCard(player);
-
-
-    return player;
 
 }
 
@@ -64,97 +67,49 @@ function normalGacha(){
 
 
 
-// 고급 뽑기
-// 🔵 A 60
-// 🟢 S 20
-// 🟡 골든글러브 15
-// 🔴 시그니처 5
-
-
-function premiumGacha(){
-
-
-    let random =
-    Math.random()*100;
-
-
-    let grade;
-
-
-
-    if(random < 60){
-
-        grade="🔵";
-
-    }
-    else if(random < 80){
-
-        grade="🟢";
-
-    }
-    else if(random < 95){
-
-        grade="🟡";
-
-    }
-    else{
-
-        grade="🔴";
-
-    }
-
-
-
-    let list =
-    players.filter(
-        p=>p.grade===grade
-    );
-
-
-
-    let player =
-    list[
-        Math.floor(
-            Math.random()*list.length
-        )
-    ];
-
-
-
-    addCard(player);
-
-
-    return player;
-
-}
-
-
-
-
-
-// 뽑기권 사용
+// 카드 뽑기
 
 function drawCard(type){
 
 
-    let result;
+    let grade =
+    getRandomGrade(type);
 
 
-    if(type==="normal"){
 
-        result=normalGacha();
+    let pool =
+    players.filter(
+        p=>p.grade===grade
+    );
+
+
+
+    if(pool.length===0){
+
+        console.log(
+        "해당 등급 선수 없음:",
+        grade
+        );
+
+        return null;
 
     }
 
 
-    if(type==="premium"){
 
-        result=premiumGacha();
+    let player =
+    pool[
+        Math.floor(
+            Math.random()*pool.length
+        )
+    ];
 
-    }
+
+
+    addCard(player);
 
 
 
-    return result;
+    return player;
 
 }
